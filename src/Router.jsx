@@ -7,6 +7,7 @@ import Dictionary from './pages/Dictionary';
 import CaseStudies from './pages/CaseStudies';
 import SecurityExplained from './pages/SecurityExplained';
 import JoinFree from './pages/JoinFree';
+import ContactUs from './pages/ContactUs';
 
 export default function Router() {
   return (
@@ -21,6 +22,7 @@ export default function Router() {
             <Route path="/case-studies" element={<CaseStudies />} />
             <Route path="/security-explained" element={<SecurityExplained />} />
             <Route path="/join-free" element={<JoinFree />} />
+            <Route path="/contact-us" element={<ContactUs />} />
           </Routes>
         </main>
         <Footer />
