@@ -99,13 +99,6 @@ export default function Hero() {
             Explore the Blog
             <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </a>
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 text-ink text-base font-medium px-8 py-3.5 rounded-xl border border-ink/15 no-underline hover:border-ink hover:bg-ink/5 transition-all duration-200"
-          >
-            <Users size={16} />
-            Join Community
-          </a>
         </motion.div>
 
         {/* Stats Bar */}
