@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Shield, Menu, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import clsx from 'clsx'
@@ -12,6 +13,7 @@ const navLinks = [
 ]
 
 export default function Navbar() {
+  const navigate = useNavigate();
     // Get current path
     const [path, setPath] = useState(window.location.pathname);
     useEffect(() => {
@@ -116,52 +118,51 @@ export default function Navbar() {
       </motion.nav>
 
       {/* Dropdown Menu — CHANGED: added backdrop, staggered animations, improved styling */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            {/* Backdrop */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 top-[68px] z-30 bg-ink/10 backdrop-blur-sm"
-              onClick={() => setMobileOpen(false)}
-            />
+      {mobileOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="fixed inset-0 top-[68px] z-30 bg-ink/10 backdrop-blur-sm"
+            onClick={() => setMobileOpen(false)}
+          />
 
-            {/* Menu Panel */}
-            <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="fixed top-[68px] left-0 right-0 z-40 bg-bg/95 backdrop-blur-xl border-b border-ink/10 px-4 sm:px-6 py-5 flex flex-col gap-1"
-            >
-              {navLinks.map((link, i) => (
-                <motion.a
-                  key={link.name}
-                  href={link.path}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="text-ink text-base font-medium no-underline hover:text-accent hover:bg-accent/5 transition-colors px-3 py-2.5 rounded-lg"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {link.name}
-                </motion.a>
-              ))}
+          {/* Menu Panel */}
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            className="fixed top-[68px] left-0 right-0 z-40 bg-bg/95 backdrop-blur-xl border-b border-ink/10 px-4 sm:px-6 py-5 flex flex-col gap-1"
+          >
+            {navLinks.map((link, i) => (
+              <motion.button
+                key={link.name}
+                type="button"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: i * 0.05 }}
+                className="text-ink text-base font-medium no-underline hover:text-accent hover:bg-accent/5 transition-colors px-3 py-2.5 rounded-lg text-left"
+                onClick={() => {
+                  setMobileOpen(false);
+                  navigate(link.path);
+                }}
+              >
+                {link.name}
+              </motion.button>
+            ))}
 
-              {/* CTA buttons — only on mobile, tablet already shows them in navbar */}
-              {path !== '/join-free' && (
-                <div className="flex gap-3 pt-3 mt-1 border-t border-ink/10 sm:hidden">
-                  <a href="/join-free" className="flex-1 text-sm text-center font-medium text-white bg-ink px-4 py-2.5 rounded-lg no-underline">
-                    Join Free →
-                  </a>
-                </div>
-              )}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
+            {/* CTA buttons — only on mobile, tablet already shows them in navbar */}
+            {path !== '/join-free' && (
+              <div className="flex gap-3 pt-3 mt-1 border-t border-ink/10 sm:hidden">
+                <a href="/join-free" className="flex-1 text-sm text-center font-medium text-white bg-ink px-4 py-2.5 rounded-lg no-underline">
+                  Join Free →
+                </a>
+              </div>
+            )}
+          </motion.div>
+        </>
+      )}
     </>
   )
 }
