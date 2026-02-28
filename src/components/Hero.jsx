@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion'
 import { ArrowRight, Users } from 'lucide-react'
+import SecurityQuizSlide from './SecurityQuizSlide';
 
 const stats = [
   { num: '12K+', label: 'Community Members' },
@@ -135,7 +136,10 @@ export default function Hero() {
         </motion.div>
       </div>
 
-      {/* Topics Infinite Scroll Strip */}
+      {/* Security Quiz Section (Slide) */}
+      <SecurityQuizSlide />
+
+      {/* Topics Infinite Scroll Strip (Moved) */}
       <div className="relative z-10 border-t border-b border-ink/10 bg-surface overflow-hidden">
         <div className="flex w-max animate-scroll-track hover:[animation-play-state:paused]">
           {allTopics.map((topic, i) => (
