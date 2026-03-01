@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 
+const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || '';
+
 const questions = [
   {
     question: 'What is the most effective way to create a strong password?',
@@ -107,6 +109,16 @@ export default function SecurityQuizSlide() {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(Array(questions.length).fill(null));
   const [showResults, setShowResults] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [feedbackError, setFeedbackError] = useState('');
+  const [feedback, setFeedback] = useState({
+    name: '',
+    email: '',
+    age: '',
+    phone: '',
+    location: '',
+  });
 
   const handleOptionChange = (oIdx) => {
     const updated = [...selected];
@@ -124,6 +136,52 @@ export default function SecurityQuizSlide() {
 
   const handlePrev = () => {
     if (current > 0) setCurrent(current - 1);
+  };
+
+  const handleFeedbackChange = (event) => {
+    const { name, value } = event.target;
+    setFeedback((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleFeedbackSubmit = async (event) => {
+    event.preventDefault();
+
+    if (!GOOGLE_SCRIPT_URL) {
+      setFeedbackError('Form endpoint is not configured. Please set VITE_GOOGLE_SCRIPT_URL in .env.');
+      return;
+    }
+
+    setIsSubmittingFeedback(true);
+    setFeedbackError('');
+
+    const payload = {
+      timestamp: new Date().toISOString(),
+      name: feedback.name,
+      email: feedback.email,
+      age: feedback.age,
+      phone: feedback.phone,
+      location: feedback.location,
+      score,
+      totalQuestion: questions.length,
+      'total question': questions.length,
+    };
+
+    try {
+      await fetch(GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      setFeedbackSubmitted(true);
+    } catch (error) {
+      setFeedbackError('Unable to submit feedback right now. Please try again.');
+    } finally {
+      setIsSubmittingFeedback(false);
+    }
   };
 
   const score = selected.filter((ans, idx) => ans === questions[idx].answer).length;
@@ -169,23 +227,97 @@ export default function SecurityQuizSlide() {
             </button>
           </div>
         </div>
+      ) : feedbackSubmitted ? (
+        <div className="text-center py-8">
+          <h3 className="text-2xl font-bold text-ink mb-2">Thank you, {feedback.name}!</h3>
+          <p className="text-ink-soft">Your feedback has been submitted successfully.</p>
+        </div>
       ) : (
-        <div className="text-center">
-          <div className="text-lg font-semibold mt-4 mb-6">
+        <div>
+          <div className="text-center text-lg font-semibold mt-4 mb-6">
             Your Score: {score} / {questions.length}
           </div>
-          {questions.map((q, idx) => (
-            <div key={idx} className="mb-4">
-              <p className="font-semibold">{idx + 1}. {q.question}</p>
-              <div>
-                {selected[idx] === q.answer ? (
-                  <span className="text-green-600">Correct!</span>
-                ) : (
-                  <span className="text-red-600">Incorrect. Correct answer: {q.options[q.answer]}</span>
-                )}
-              </div>
+
+          <form onSubmit={handleFeedbackSubmit} className="space-y-4">
+            <h3 className="text-xl font-semibold text-center">Feedback Form</h3>
+
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium mb-1">Name</label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={feedback.name}
+                onChange={handleFeedbackChange}
+                required
+                className="w-full px-3 py-2 border border-ink/20 rounded-md outline-none focus:ring-2 focus:ring-accent/30"
+              />
             </div>
-          ))}
+
+            <div>
+              <label htmlFor="email" className="block text-sm font-medium mb-1">Email</label>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={feedback.email}
+                onChange={handleFeedbackChange}
+                required
+                className="w-full px-3 py-2 border border-ink/20 rounded-md outline-none focus:ring-2 focus:ring-accent/30"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="age" className="block text-sm font-medium mb-1">Age</label>
+              <input
+                id="age"
+                name="age"
+                type="number"
+                min="1"
+                value={feedback.age}
+                onChange={handleFeedbackChange}
+                required
+                className="w-full px-3 py-2 border border-ink/20 rounded-md outline-none focus:ring-2 focus:ring-accent/30"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="phone" className="block text-sm font-medium mb-1">Phone Number (Optional)</label>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                value={feedback.phone}
+                onChange={handleFeedbackChange}
+                className="w-full px-3 py-2 border border-ink/20 rounded-md outline-none focus:ring-2 focus:ring-accent/30"
+              />
+            </div>
+
+            <div>
+              <label htmlFor="location" className="block text-sm font-medium mb-1">Where are you from?</label>
+              <input
+                id="location"
+                name="location"
+                type="text"
+                value={feedback.location}
+                onChange={handleFeedbackChange}
+                required
+                className="w-full px-3 py-2 border border-ink/20 rounded-md outline-none focus:ring-2 focus:ring-accent/30"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={isSubmittingFeedback}
+              className="w-full py-2 px-4 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-60"
+            >
+              {isSubmittingFeedback ? 'Submitting...' : 'Submit Feedback'}
+            </button>
+
+            {feedbackError && (
+              <p className="text-sm text-red-600 text-center">{feedbackError}</p>
+            )}
+          </form>
         </div>
       )}
     </section>
