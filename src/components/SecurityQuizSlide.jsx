@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || '';
+const GOOGLE_SCRIPT_URL = import.meta.env.VITE_GOOGLE_SCRIPT_URL || 'https://script.google.com/macros/s/AKfycbyEx0axzmv9zxREvbwup-RPKFIpiUKhW1f8Bxbl9XYEViJumCA0IBjh6yEiLPH5xnZQhQ/exec';
 
 const questions = [
   {
